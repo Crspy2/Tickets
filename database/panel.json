@@ -1,0 +1,28 @@
+{
+  "panel_id": "int",
+  "guild_id": "Snowflake",
+  "team": "team_id",
+  "naming_scheme": "str",
+  "mention_user_on_open": "bool",
+  "mention_role": "int",
+  "title": "str",
+  "message_id": "int",
+  "target_category": "int",
+  "welcome_message": "str",
+  "default_team": "int",
+  "support_roles": "list[int]",
+  "embed": {
+    "title": "str",
+    "description": "str",
+    "color": "hex",
+    "emoji_name": "str",
+    "emoji_id": "int",
+    "image_url": "str",
+    "thumbnail_url": "str",
+    "fields": "list[EmbedField]",
+    "footer_text": "str",
+    "footer_icon": "str",
+    "button_style": "int",
+    "button_label": "str"
+  }
+}

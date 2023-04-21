@@ -1,0 +1,16 @@
+{
+  "guild_id": "Snowflake",
+  "ticket_id": "int",
+  "channel_id": "Snowflake",
+  "panel_id": "int",
+  "user_id": "Snowflake",
+  "close_at": "time",
+  "close_reason": "str",
+  "claimed": "bool",
+  "claimed_by": "Snowflake",
+  "opened_at": "time",
+  "response_time": "time",
+
+  "last_message_id": "int",
+  "last_message_time": "time"
+}

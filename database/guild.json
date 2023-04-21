@@ -1,0 +1,32 @@
+{
+  "guild_id": "guild_id",
+  "hide_claim_button": "bool",
+  "disable_open_command": "bool",
+  "transcripts": {
+    "store_transcripts": "bool",
+    "transcript_channel": "int"
+  },
+  "use_threads": "bool",
+  "overflow": {
+    "overflow_enabled": "bool",
+    "overflow_category": "int"
+  },
+  "ticket_notification_channel": "int",
+  "admins": ["user_id"],
+  "support": ["user_id"],
+  "blacklisted": ["user_id"],
+  "claim_settings": {
+    "support_can_view": "bool",
+    "support_can_type": "bool"
+  },
+  "limit": "int",
+  "close_confirmation": "bool",
+  "users_can_close": "bool",
+  "dm_on_open": "bool",
+  "feedback_enabled": "bool",
+  "on_call_role": "int",
+  "premium": {
+    "is_premium": "bool",
+    "expiry": null
+  }
+}
