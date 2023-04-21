@@ -11,7 +11,7 @@ load_dotenv()
 class GuildDB:
     def __init__(self, guild: Guild):
         self.guild = guild
-        self.client = MongoClient("mongodb://mongo:muDE7My0G7Db02HHxo2I@containers.railway.app:5473")
+        self.client = MongoClient("MONGO_URL")
         self.db = self.client[f'{guild.id}']
         self.settings = self.db['settings']
 
