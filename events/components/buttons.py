@@ -1,4 +1,5 @@
-from interactions import listen, Client, Extension, Embed, Button, ButtonStyle, EmbedFooter, ActionRow
+from interactions import listen, Client, Extension, Embed, Button, ButtonStyle, EmbedFooter, ActionRow, \
+    PermissionOverwrite
 from interactions.api.events import Component
 
 from database.guild import GuildDB
@@ -103,6 +104,13 @@ class Buttons(Extension):
             )
             return await event.ctx.edit_origin(embed=confirm_embed, components=[])
         elif custom_id.startswith("close"):
+            if not settings.get('users_can_close'):
+                not_allowed = Embed(
+                    title="Invalid Permissions",
+                    description="You don't have the required permissions to close this ticket!",
+                    color=self.bot.error
+                )
+                return await event.ctx.send(embed=not_allowed, ephemeral=True)
             ticket_channel = event.ctx.guild.get_channel(custom_id.split("_")[1])
 
         elif custom_id.startswith("close_with_reason"):
@@ -155,6 +163,7 @@ class Buttons(Extension):
                 )
             )
             await ticket_message.edit(embed=ticket_embed, components=[components])
+            await ticket_channel.set_permission(event.ctx.author, view_channel=True)
 
             claimed = Embed(
                 title="Claimed Ticket",
@@ -165,6 +174,23 @@ class Buttons(Extension):
                     icon_url=self.bot.user.avatar.url
                 )
             )
+            admins = []
+            for admin in (settings.get('admins') and settings.get('support')):
+                a = await self.client.fetch_user(admin)
+                if a is not None:
+                    admins.append(a)
+                a = await event.ctx.guild.fetch_role(admin)
+                if a is not None:
+                    admins.append(a)
+
+            if not settings.get('claim_settings.support_can_view'):
+                for admin in admins:
+                    await ticket_channel.set_permission(admin, view_channel=False)
+
+            if not settings.get('claim_settings.support_can_type'):
+                for admin in admins:
+                    await ticket_channel.set_permission(admin, send_messages=False)
+
             return await event.ctx.send(embed=claimed)
 
 

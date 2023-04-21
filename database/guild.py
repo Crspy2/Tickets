@@ -38,11 +38,12 @@ class GuildDB:
             },
             "limit": 1,
             "close_confirmation": True,  # Implement: OPEN
-            "users_can_close": True,  # Implement: OPEN
-            "ping_on_open": False,  # Implement: OPEN
+            "users_can_close": True,
+            "ping_user_on_open": True,
+            "ping_admin_on_open": True,
             "feedback_enabled": True,
             "on_call_role": None,  # Implement: OPEN
-            "default_category": None,  # Implement: OPEN
+            "default_category": None,
             "default_naming_schema": "ticket-{{username}}",
             "close_on_leave": True,  # Implement: OPEN
             "welcome_message": "Thank you for contacting support.\nPlease describe your issue (and provide an invite to your server if applicable) and wait for a response.",
