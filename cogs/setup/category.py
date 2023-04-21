@@ -10,15 +10,14 @@ class Limit(Extension):
 
     @subcommand(
         base="set",
-        name="limit",
-        description="Easily configure the ticket.json limit for a user",
+        name="category",
+        description="Sets the default category for tickets to be placed in",
     )
     @slash_option(
-        name="limit",
-        description="The maximum amount of tickets a user can have open simultaneously",
+        name="category",
+        description="The category to put tickets in",
         required=True,
-        opt_type=OptionType.INTEGER,
-        min_value=1
+        opt_type=OptionType.CHANNEL,
     )
     async def category(self, ctx: SlashContext, category: GuildCategory):
         await ctx.defer(ephemeral=True)

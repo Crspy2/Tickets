@@ -33,18 +33,18 @@ class GuildDB:
             "support": [],
             "blacklisted": [],
             "claim_settings": {
-                "support_can_view": True,
-                "support_can_type": False
+                "support_can_view": True,  # Implement: OPEN
+                "support_can_type": False  # Implement: OPEN
             },
             "limit": 1,
-            "close_confirmation": True,
-            "users_can_close": True,
-            "dm_on_open": False,
+            "close_confirmation": True,  # Implement: OPEN
+            "users_can_close": True,  # Implement: OPEN
+            "ping_on_open": False,  # Implement: OPEN
             "feedback_enabled": True,
-            "on_call_role": None,
-            "default_category": None,
-            "default_naming_scheme": "ticket-{{username}}",
-            "close_on_leave": True,
+            "on_call_role": None,  # Implement: OPEN
+            "default_category": None,  # Implement: OPEN
+            "default_naming_schema": "ticket-{{username}}",
+            "close_on_leave": True,  # Implement: OPEN
             "welcome_message": "Thank you for contacting support.\nPlease describe your issue (and provide an invite to your server if applicable) and wait for a response.",
             "threads": {
                 "use_threads": False,
