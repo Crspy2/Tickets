@@ -2,7 +2,7 @@ import os
 from typing import Mapping
 
 from pymongo import MongoClient
-from interactions import Guild, Snowflake
+from interactions import Guild, Snowflake, User, Member, Role
 from dotenv import load_dotenv
 
 load_dotenv()
@@ -83,8 +83,22 @@ class GuildDB:
         result = self.settings.delete_one({"guild_id": self.guild.id})
         return result.deleted_count
 
-    def is_user_admin(self, user_id: Snowflake) -> bool:
-        return user_id in self.get_guild_info().get('admins', [])
+    def is_user_admin(self, user_or_role: Member | Role) -> bool:
+        is_admin = user_or_role.id in self.get_guild_info().get('admins', [])
+        if not is_admin and type(user_or_role) is not Role:
+            for role in user_or_role.roles:
+                if role.id in self.get_guild_info().get('admins', []):
+                    return True
+                else:
+                    return False
+        return True
 
-    def is_user_support(self, user_id: Snowflake) -> bool:
-        return user_id in self.get_guild_info().get('support', [])
+    def is_user_support(self, user_or_role: Member | Role) -> bool:
+        is_support = user_or_role.id in self.get_guild_info().get('support', [])
+        if not is_support and type(user_or_role) is not Role:
+            for role in user_or_role.roles:
+                if role.id in self.get_guild_info().get('support', []):
+                    return True
+                else:
+                    return False
+        return True
