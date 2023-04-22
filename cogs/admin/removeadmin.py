@@ -31,7 +31,7 @@ class RemoveAdmin(Extension):
         has_admin_roles = set(author_roles).intersection(set(admins))
 
         # Check if interaction author is not an admin
-        if not db.is_user_admin(ctx.author):
+        if not db.is_admin(ctx.author.id):
             if not has_admin_roles:
                 no_perms = Embed(
                     title="Error",
@@ -51,7 +51,7 @@ class RemoveAdmin(Extension):
             return await ctx.send(embed=is_owner)
 
         # Check if user is already an admin:
-        if not db.is_user_admin(user_or_role):
+        if not db.is_admin(user_or_role.id):
             error_embed = Embed(
                 title="Error",
                 description="User is not an admin!",

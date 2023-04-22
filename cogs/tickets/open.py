@@ -20,6 +20,7 @@ class Open(Extension):
         opt_type=OptionType.STRING
     )
     async def open(self, ctx: SlashContext, subject: str = None):
+        await ctx.defer(ephemeral=True)
         guild_db = GuildDB(ctx.guild)
         tickets_db = TicketDB(ctx.guild)
         settings = guild_db.get_guild_info()
@@ -76,10 +77,13 @@ class Open(Extension):
             id=ctx.guild.default_role.id,
             deny=Permissions.VIEW_CHANNEL
         ))
-        await ticket_channel.set_permission(ctx.author, add_reactions=True, attach_files=True,
-                                            read_message_history=True, send_messages=True,
-                                            use_application_commands=True, use_external_emojis=True,
-                                            use_external_stickers=True, view_channel=True)
+        await ticket_channel.set_permission(ctx.author, send_messages=True, embed_links=True, attach_files=True,
+                                            add_reactions=True, read_message_history=True, use_application_commands=True,
+                                            view_channel=True)
+
+        await ticket_channel.set_permission(ctx.bot.user, send_messages=True, embed_links=True, attach_files=True,
+                                            add_reactions=True, read_message_history=True,
+                                            use_application_commands=True, view_channel=True)
 
         admins = []
         for admin in (settings.get('admins') and settings.get('support')):
@@ -91,10 +95,9 @@ class Open(Extension):
                 admins.append(a)
 
         for admin in admins:
-            await ticket_channel.set_permission(admin, add_reactions=True, attach_files=True,
-                                                read_message_history=True, send_messages=True,
-                                                use_application_commands=True, use_external_emojis=True,
-                                                use_external_stickers=True, view_channel=True)
+            await ticket_channel.set_permission(admin, send_messages=True, embed_links=True, attach_files=True,
+                                                add_reactions=True, read_message_history=True,
+                                                use_application_commands=True, view_channel=True)
 
         ticket_embed = Embed(
             title=subject if subject is not None else 'No subject given',
@@ -119,13 +122,13 @@ class Open(Extension):
                 style=ButtonStyle.RED,
                 label="Close",
                 emoji="🔒",
-                custom_id=f"close_{ticket_channel.id}"
+                custom_id=f"close"
             ),
             Button(
                 style=ButtonStyle.RED,
                 label="Close With Reason",
                 emoji="🔒",
-                custom_id=f"close_with_reason_{ticket_channel.id}"
+                custom_id=f"close-with-reason"
             )
         )
 
@@ -135,7 +138,8 @@ class Open(Extension):
                     style=ButtonStyle.GREEN,
                     label="Claim",
                     emoji="🙋‍♂️",
-                    custom_id=f"claim_{subject}_{ticket_channel.id}_{ticket_msg.id}"
+                    custom_id=f"claim_{subject}"
+                    # custom_id=f"claim_{subject}_{ticket_channel.id}_{ticket_msg.id}"
                 )
             )
 

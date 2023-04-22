@@ -1,4 +1,7 @@
-from interactions import listen, Client, Extension, Embed, Button, ButtonStyle, EmbedFooter, ActionRow
+import time
+
+from interactions import listen, Client, Extension, Embed, Button, ButtonStyle, EmbedFooter, ActionRow, Modal, \
+    ModalContext, ParagraphText, EmbedAuthor, EmbedField
 from interactions.api.events import Component
 
 from database.guild import GuildDB
@@ -21,6 +24,8 @@ class Buttons(Extension):
         if custom_id.startswith("addadmin_"):
             new_admin_id = custom_id.split("_")[1]
             new_admin = event.ctx.guild.get_member(new_admin_id)
+            if new_admin is None:
+                new_admin = event.ctx.guild.get_role(new_admin_id)
 
             # Check if user is OWNER
             owner = await event.ctx.guild.fetch_owner()
@@ -33,7 +38,8 @@ class Buttons(Extension):
                 return await event.ctx.edit_origin(embed=is_owner, components=[])
 
             # Check if user is already an admin:
-            if db.is_user_admin(new_admin):
+            print(f"Person's admin status is {db.is_support(new_admin.id)}")
+            if db.is_admin(new_admin.id) is True:
                 error_embed = Embed(
                     title="Error",
                     description="User is already an admin!",
@@ -42,15 +48,13 @@ class Buttons(Extension):
                 return await event.ctx.edit_origin(embed=error_embed, components=[])
 
             # Check if user is a support representative
-            if db.is_user_support(new_admin):
+            if db.is_support(new_admin.id):
                 support = support
-                support.remove(str(new_admin_id))
-                support = {'support': support}
+                support.remove(new_admin_id)
 
-            admins.append(new_admin_id)
-            admins = {'admins': admins}
+            admins.append(new_admin.id)
 
-            db.update_guild_info(**admins, **support)
+            db.update_guild_info(**{'admins': admins}, **{'support': support})
 
             # Tell user how it went!
             confirm_embed = Embed(
@@ -62,6 +66,8 @@ class Buttons(Extension):
         elif custom_id.startswith("addsupport_"):
             new_support_id = custom_id.split("_")[1]
             new_support = event.ctx.guild.get_member(new_support_id)
+            if new_support is None:
+                new_support = event.ctx.guild.get_role(new_support_id)
             # Check if user is OWNER
             owner = await event.ctx.guild.fetch_owner()
             if new_support.id == owner.id:
@@ -72,8 +78,8 @@ class Buttons(Extension):
                 )
                 return await event.ctx.edit_origin(embed=is_owner, components=[])
 
-            # Check if user is already an admin:
-            if db.is_user_admin(new_support):
+            # Check if user is already a support rep:
+            if db.is_admin(new_support.id) is True:
                 error_embed = Embed(
                     title="Error",
                     description="User is already an admin!",
@@ -82,7 +88,7 @@ class Buttons(Extension):
                 return await event.ctx.edit_origin(embed=error_embed, components=[])
 
             # Check if user is already on the support team:
-            if db.is_user_support(new_support):
+            if db.is_support(new_support.id):
                 error_embed = Embed(
                     title="Error",
                     description="User is already a support representative!",
@@ -90,7 +96,7 @@ class Buttons(Extension):
                 )
                 return await event.ctx.edit_origin(embed=error_embed, components=[])
 
-            support.append(new_support_id)
+            support.append(new_support.id)
             support = {'support': support}
 
             db.update_guild_info(**support)
@@ -102,30 +108,37 @@ class Buttons(Extension):
                 color=self.client.success
             )
             return await event.ctx.edit_origin(embed=confirm_embed, components=[])
-        elif custom_id.startswith("close"):
-            if not settings.get('users_can_close'):
-                if not (db.is_user_admin(event.ctx.author) or db.is_user_support(event.ctx.author)):
-                    not_allowed = Embed(
-                        title="Invalid Permissions",
-                        description="You don't have the required permissions to close this ticket!",
-                        color=self.bot.error
-                    )
-                    return await event.ctx.send(embed=not_allowed, ephemeral=True)
-            ticket_channel = event.ctx.guild.get_channel(custom_id.split("_")[1])
-
-            await ticket_channel.send("Closed")
-
-
-        elif custom_id.startswith("close_with_reason"):
+        elif custom_id == "close-with-reason":
             if not settings.get('users_can_close'):
                 not_allowed = Embed(
                     title="Invalid Permissions",
                     description="You don't have the required permissions to close this ticket!",
                     color=self.bot.error
                 )
-                return await event.ctx.send(embed=not_allowed, ephemeral=True)
-            ticket_channel = event.ctx.guild.get_channel(custom_id.split("_")[1])
+                return await event.ctx.channel.send(embed=not_allowed, ephemeral=True)
 
+            reason = Modal(
+                ParagraphText(
+                    label="Reason",
+                    placeholder='Reason for closing the ticket, e.g. "Resolved"',
+                    custom_id="reason"
+                ),
+                title="My Modal",
+            )
+            await event.ctx.send_modal(modal=reason)
+
+            modal_ctx: ModalContext = await event.ctx.bot.wait_for_modal(reason)
+            await tickets.close_ticket(modal_ctx)
+        elif custom_id == "close":
+            if not settings.get('users_can_close'):
+                if not (db.is_admin(event.ctx.author.id) or db.is_support(event.ctx.author.id)):
+                    not_allowed = Embed(
+                        title="Invalid Permissions",
+                        description="You don't have the required permissions to close this ticket!",
+                        color=self.bot.error
+                    )
+                    return await event.ctx.send(embed=not_allowed, ephemeral=True)
+            await tickets.close_ticket(event.ctx)
         elif custom_id.startswith("claim"):
 
             author_roles = []
@@ -135,7 +148,7 @@ class Buttons(Extension):
             has_admin_roles = set(author_roles).intersection(set(admins))
 
             # Check if interaction author is an admin
-            if not db.is_user_admin(event.ctx.author):
+            if not db.is_admin(event.ctx.author.id):
                 if not has_admin_roles:
                     no_perms = Embed(
                         title="Error",
@@ -145,8 +158,10 @@ class Buttons(Extension):
                     return await event.ctx.send(embed=no_perms, ephemeral=True)
 
             subject = custom_id.split("_")[1]
-            ticket_channel = event.ctx.guild.get_channel(custom_id.split("_")[2])
-            ticket_message = ticket_channel.get_message(custom_id.split("_")[3])
+            ticket_channel = event.ctx.channel
+            ticket_message = event.ctx.message
+            # ticket_channel = event.ctx.guild.get_channel(custom_id.split("_")[2])
+            # ticket_message = ticket_channel.get_message(custom_id.split("_")[3])
 
             tickets.update_ticket_info(ticket_channel, **{'claimed': True}, **{'claimed_by': event.ctx.author.id})
             ticket_embed = Embed(
@@ -169,11 +184,10 @@ class Buttons(Extension):
                     style=ButtonStyle.RED,
                     label="Close With Reason",
                     emoji="🔒",
-                    custom_id=f"close_with_reason"
+                    custom_id=f"close-with-reason"
                 )
             )
             await ticket_message.edit(embed=ticket_embed, components=[components])
-            await ticket_channel.set_permission(event.ctx.author, view_channel=True)
 
             claimed = Embed(
                 title="Claimed Ticket",
@@ -184,22 +198,20 @@ class Buttons(Extension):
                     icon_url=self.bot.user.avatar.url
                 )
             )
-            admins = []
-            for admin in (settings.get('admins') and settings.get('support')):
-                a = await self.client.fetch_user(admin)
+            support = []
+            for rep in settings.get('support'):
+                a = await self.client.fetch_user(rep)
                 if a is not None:
-                    admins.append(a)
-                a = await event.ctx.guild.fetch_role(admin)
+                    support.append(a)
+                a = await event.ctx.guild.fetch_role(rep)
                 if a is not None:
-                    admins.append(a)
-
+                    support.append(a)
             if not settings.get('claim_settings.support_can_view'):
-                for admin in admins:
-                    await ticket_channel.set_permission(admin, view_channel=False)
-
-            if not settings.get('claim_settings.support_can_type'):
-                for admin in admins:
-                    await ticket_channel.set_permission(admin, send_messages=False)
+                for rep in support:
+                    await ticket_channel.set_permission(rep, view_channel=False)
+            elif not settings.get('claim_settings.support_can_type'):
+                for rep in support:
+                    await ticket_channel.set_permission(rep, view_channel=True, send_messages=False, add_reactions=False)
 
             return await event.ctx.send(embed=claimed)
 

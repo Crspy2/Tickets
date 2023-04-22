@@ -11,7 +11,7 @@ load_dotenv()
 class GuildDB:
     def __init__(self, guild: Guild):
         self.guild = guild
-        self.client = MongoClient("MONGO_URL")
+        self.client = MongoClient("mongodb://mongo:muDE7My0G7Db02HHxo2I@containers.railway.app:5473")
         self.db = self.client[f'{guild.id}']
         self.settings = self.db['settings']
 
@@ -19,7 +19,7 @@ class GuildDB:
         self.client.close()
 
     def __repr__(self):
-        return f"<GuildDB(uri={os.environ.get('DB_URL')}, guild={self.guild})>"
+        return f"<GuildDB(guild={self.guild})>"
 
     async def create_guild(self):
         guild_owner = await self.guild.fetch_owner()
@@ -38,6 +38,7 @@ class GuildDB:
             },
             "limit": 1,
             "close_confirmation": True,  # Implement: OPEN
+            "close_delay": 5,
             "users_can_close": True,
             "ping_user_on_open": True,
             "ping_admin_on_open": True,
@@ -83,22 +84,10 @@ class GuildDB:
         result = self.settings.delete_one({"guild_id": self.guild.id})
         return result.deleted_count
 
-    def is_user_admin(self, user_or_role: Member | Role) -> bool:
-        is_admin = user_or_role.id in self.get_guild_info().get('admins', [])
-        if not is_admin and type(user_or_role) is not Role:
-            for role in user_or_role.roles:
-                if role.id in self.get_guild_info().get('admins', []):
-                    return True
-                else:
-                    return False
-        return True
+    def is_admin(self, user_or_role_id: Snowflake) -> bool:
+        print(self.get_guild_info().get('admins'))
+        print(user_or_role_id)
+        return user_or_role_id in self.get_guild_info().get('admins')
 
-    def is_user_support(self, user_or_role: Member | Role) -> bool:
-        is_support = user_or_role.id in self.get_guild_info().get('support', [])
-        if not is_support and type(user_or_role) is not Role:
-            for role in user_or_role.roles:
-                if role.id in self.get_guild_info().get('support', []):
-                    return True
-                else:
-                    return False
-        return True
+    def is_support(self, user_or_role_id: Snowflake) -> bool:
+        return user_or_role_id in self.get_guild_info().get('support')
