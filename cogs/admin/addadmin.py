@@ -1,5 +1,5 @@
 from interactions import Extension, Client, SlashContext, OptionType, User, Role, Embed, \
-    Button, ButtonStyle, slash_command, slash_option
+    Button, ButtonStyle, slash_command, slash_option, EmbedFooter
 
 from database.guild import GuildDB
 
@@ -36,7 +36,11 @@ class AddAdmin(Extension):
                 no_perms = Embed(
                     title="Error",
                     description="You do not have permissions for this command!",
-                    color=self.client.error
+                    color=self.client.error,
+                    footer=EmbedFooter(
+                        text="Powered by altera.vip",
+                        icon_url=self.bot.user.avatar.url
+                    )
                 )
                 return await ctx.send(embed=no_perms)
 
@@ -44,7 +48,11 @@ class AddAdmin(Extension):
         confirm_embed = Embed(
             title="Add Admin",
             description=f"Please confirm that you want to add {user_or_role.mention} as a bot administrator",
-            color=self.client.success
+            color=self.client.success,
+            footer=EmbedFooter(
+                text="Powered by altera.vip",
+                icon_url=self.bot.user.avatar.url
+            )
         )
 
         button = Button(

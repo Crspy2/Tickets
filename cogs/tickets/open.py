@@ -44,7 +44,11 @@ class Open(Extension):
             ticket_limit = Embed(
                 title="Ticket Limit Reached",
                 description="You already have the maximum amount of allowed tickets open at once!",
-                color=self.bot.error
+                color=self.bot.error,
+                footer=EmbedFooter(
+                    text="Powered by altera.vip",
+                    icon_url=self.bot.user.avatar.url
+                )
             )
             return await ctx.send(embed=ticket_limit, ephemeral=True)
 

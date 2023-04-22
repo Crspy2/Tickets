@@ -20,7 +20,8 @@ class Invite(Extension):
                         f"to your server!**",
             color=self.client.success,
             footer=EmbedFooter(
-                text=f"Requested by {ctx.author.user.username}"
+                text="Powered by altera.vip",
+                icon_url=self.bot.user.avatar.url
             ),
             url="https://discord.gg/alterasms",
             thumbnail=EmbedAttachment(ctx.author.user.avatar.url),

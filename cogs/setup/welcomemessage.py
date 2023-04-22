@@ -1,5 +1,5 @@
 from interactions import Extension, Client, SlashContext, subcommand, Embed, Modal, ParagraphText, ModalContext, \
-    ShortText
+    ShortText, EmbedFooter
 
 from database.guild import GuildDB
 
@@ -45,7 +45,11 @@ class WelcomeMessage(Extension):
                 no_perms = Embed(
                     title="Error",
                     description="You do not have permissions for this command!",
-                    color=self.client.error
+                    color=self.client.error,
+                    footer=EmbedFooter(
+                        text="Powered by altera.vip",
+                        icon_url=self.bot.user.avatar.url
+                    )
                 )
                 return await welcome_modal_ctx.send(embed=no_perms)
 
@@ -55,7 +59,11 @@ class WelcomeMessage(Extension):
         confirm_embed = Embed(
             title="Setup",
             description="The welcome message has been updated. Open a ticket to see it in action",
-            color=self.client.success
+            color=self.client.success,
+            footer=EmbedFooter(
+                text="Powered by altera.vip",
+                icon_url=self.bot.user.avatar.url
+            )
         )
         await welcome_modal_ctx.send(embed=confirm_embed)
 

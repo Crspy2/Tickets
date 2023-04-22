@@ -1,5 +1,5 @@
 from interactions import Extension, Client, SlashContext, OptionType, User, Role, Embed, \
-    slash_command, slash_option
+    slash_command, slash_option, EmbedFooter
 
 from database.guild import GuildDB
 
@@ -36,7 +36,11 @@ class RemoveAdmin(Extension):
                 no_perms = Embed(
                     title="Error",
                     description="You do not have permissions for this command!",
-                    color=self.client.error
+                    color=self.client.error,
+                    footer=EmbedFooter(
+                        text="Powered by altera.vip",
+                        icon_url=self.bot.user.avatar.url
+                    )
                 )
                 return await ctx.send(embed=no_perms)
 
@@ -46,7 +50,11 @@ class RemoveAdmin(Extension):
             is_owner = Embed(
                 title="Error",
                 description="The server owner must be an admin",
-                color=self.client.error
+                color=self.client.error,
+                footer=EmbedFooter(
+                    text="Powered by altera.vip",
+                    icon_url=self.bot.user.avatar.url
+                )
             )
             return await ctx.send(embed=is_owner)
 
@@ -55,7 +63,11 @@ class RemoveAdmin(Extension):
             error_embed = Embed(
                 title="Error",
                 description="User is not an admin!",
-                color=self.client.error
+                color=self.client.error,
+                footer=EmbedFooter(
+                    text="Powered by altera.vip",
+                    icon_url=self.bot.user.avatar.url
+                )
             )
             return await ctx.send(embed=error_embed)
 
@@ -69,6 +81,10 @@ class RemoveAdmin(Extension):
             title="Remove Admin",
             description=f"Admin removed successfully",
             color=self.client.success,
+            footer=EmbedFooter(
+                text="Powered by altera.vip",
+                icon_url=self.bot.user.avatar.url
+            )
         )
 
         await ctx.send(embed=confirm_embed)

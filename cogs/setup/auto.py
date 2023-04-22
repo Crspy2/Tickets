@@ -1,5 +1,5 @@
 from interactions import Extension, Client, SlashContext, subcommand, PermissionOverwrite, \
-    Embed, OverwriteType, Permissions
+    Embed, OverwriteType, Permissions, EmbedFooter
 
 from database.guild import GuildDB
 
@@ -32,7 +32,11 @@ class Auto(Extension):
                 no_perms = Embed(
                     title="Error",
                     description="You do not have permissions for this command!",
-                    color=self.client.error
+                    color=self.client.error,
+                    footer=EmbedFooter(
+                        text="Powered by altera.vip",
+                        icon_url=self.bot.user.avatar.url
+                    )
                 )
                 return await ctx.send(embed=no_perms)
 
@@ -81,7 +85,11 @@ class Auto(Extension):
                         "✅ Created Tickets Category\n"
                         "\n"
                         f"Setup complete. The {admin_role.mention} and {support_role.mention} roles have been added to the the default panel!",
-            color=self.client.success
+            color=self.client.success,
+            footer=EmbedFooter(
+                text="Powered by altera.vip",
+                icon_url=self.bot.user.avatar.url
+            )
         )
         return await ctx.send(embed=confirm_embed)
 

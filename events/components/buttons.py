@@ -108,12 +108,18 @@ class Buttons(Extension):
                 color=self.client.success
             )
             return await event.ctx.edit_origin(embed=confirm_embed, components=[])
+
+
         elif custom_id == "close-with-reason":
             if not settings.get('users_can_close'):
                 not_allowed = Embed(
                     title="Invalid Permissions",
                     description="You don't have the required permissions to close this ticket!",
-                    color=self.bot.error
+                    color=self.bot.error,
+                    footer=EmbedFooter(
+                        text="Powered by altera.vip",
+                        icon_url=self.bot.user.avatar.url
+                    )
                 )
                 return await event.ctx.channel.send(embed=not_allowed, ephemeral=True)
 
@@ -135,12 +141,40 @@ class Buttons(Extension):
                     not_allowed = Embed(
                         title="Invalid Permissions",
                         description="You don't have the required permissions to close this ticket!",
-                        color=self.bot.error
+                        color=self.bot.error,
+                        footer=EmbedFooter(
+                            text="Powered by altera.vip",
+                            icon_url=self.bot.user.avatar.url
+                        )
                     )
                     return await event.ctx.send(embed=not_allowed, ephemeral=True)
-            await tickets.close_ticket(event.ctx)
-        elif custom_id.startswith("claim"):
 
+            if settings.get('close_confirmation'):
+                close_conf_embed = Embed(
+                    author=EmbedAuthor(
+                        name=event.ctx.author.user.username,
+                        icon_url=event.ctx.author.user.display_avatar.url
+                    ),
+                    title="Close Confirmation",
+                    description="Please confirm that you want to close this ticket",
+                    footer=EmbedFooter(
+                        text="Powered by altera.vip",
+                        icon_url=self.bot.user.avatar.url
+                    )
+                )
+                close_btn = Button(
+                    style=ButtonStyle.BLUE,
+                    label="Close",
+                    emoji="✔️",
+                    custom_id="close_conf"
+                )
+                return await event.ctx.send(embed=close_conf_embed, components=[close_btn])
+            return await tickets.close_ticket(event.ctx)
+        elif custom_id == "close_conf":
+            return await tickets.close_ticket(event.ctx)
+
+
+        elif custom_id == "claim":
             author_roles = []
             for role in event.ctx.author.roles:
                 author_roles.append(str(role.id))
@@ -153,7 +187,11 @@ class Buttons(Extension):
                     no_perms = Embed(
                         title="Error",
                         description="You do not have permissions for this command!",
-                        color=self.client.error
+                        color=self.client.error,
+                        footer=EmbedFooter(
+                            text="Powered by altera.vip",
+                            icon_url=self.bot.user.avatar.url
+                        )
                     )
                     return await event.ctx.send(embed=no_perms, ephemeral=True)
 

@@ -1,4 +1,4 @@
-from interactions import Extension, Client, SlashContext, slash_command, EmbedField, Embed
+from interactions import Extension, Client, SlashContext, slash_command, EmbedField, Embed, EmbedFooter
 
 from database.guild import GuildDB
 
@@ -44,6 +44,10 @@ class ViewStaff(Extension):
         e = Embed(
             title="Staff",
             color=self.client.success,
+            footer=EmbedFooter(
+                text="Powered by altera.vip",
+                icon_url=self.bot.user.avatar.url
+            ),
             fields=[
                 EmbedField(
                     name="Admin Users",

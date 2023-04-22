@@ -1,5 +1,5 @@
 from interactions import Extension, Client, SlashContext, subcommand, slash_option, OptionType, \
-    Embed, GuildChannel
+    Embed, GuildChannel, EmbedFooter
 
 from database.guild import GuildDB
 
@@ -42,7 +42,11 @@ class Limit(Extension):
                 no_perms = Embed(
                     title="Error",
                     description="You do not have permissions for this command!",
-                    color=self.client.error
+                    color=self.client.error,
+                    footer=EmbedFooter(
+                        text="Powered by altera.vip",
+                        icon_url=self.bot.user.avatar.url
+                    )
                 )
                 return await ctx.send(embed=no_perms)
 
@@ -50,7 +54,11 @@ class Limit(Extension):
             missing_arg = Embed(
                 title="Missing Argument",
                 description="You must provide a ticket notification channel!",
-                color=self.client.error
+                color=self.client.error,
+                footer=EmbedFooter(
+                    text="Powered by altera.vip",
+                    icon_url=self.bot.user.avatar.url
+                )
             )
             return await ctx.send(embed=missing_arg)
 
@@ -61,7 +69,11 @@ class Limit(Extension):
         confirm_embed = Embed(
             title="Setup",
             description=f"Thread mode has been {'enabled' if ctx.kwargs['use_threads'] else 'disabled'}",
-            color=self.client.success
+            color=self.client.success,
+            footer=EmbedFooter(
+                text="Powered by altera.vip",
+                icon_url=self.bot.user.avatar.url
+            )
         )
         return await ctx.send(embed=confirm_embed)
 

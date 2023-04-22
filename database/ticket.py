@@ -57,13 +57,22 @@ class TicketDB:
         return result.modified_count
 
     async def close_ticket(self, ctx: ModalContext | ComponentContext) -> None:
-        update = {
-            "$set": {
-                "close_reason": 'No reason specified' if ctx.responses is None else ctx.responses.get('reason'),
-                "closed_at": int(time.time()),
+        if type(ctx) is ModalContext:
+            update = {
+                "$set": {
+                    "close_reason": ctx.responses.get('reason'),
+                    "closed_at": int(time.time()),
+                }
             }
-        }
-        self.tickets.update_one({"channel_id": ctx.channel.id}, update)
+            self.tickets.update_one({"channel_id": ctx.channel.id}, update)
+        if type(ctx) is ComponentContext:
+            update = {
+                "$set": {
+                    "close_reason": 'No reason specified',
+                    "closed_at": int(time.time()),
+                }
+            }
+            self.tickets.update_one({"channel_id": ctx.channel.id}, update)
 
         this_ticket = self.get_ticket_info(ctx.channel)
         transcript = Embed(

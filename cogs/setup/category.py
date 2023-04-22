@@ -1,5 +1,5 @@
 from interactions import Extension, Client, SlashContext, subcommand, slash_option, OptionType, \
-    Embed, GuildCategory
+    Embed, GuildCategory, EmbedFooter
 
 from database.guild import GuildDB
 
@@ -35,7 +35,11 @@ class Limit(Extension):
                 no_perms = Embed(
                     title="Error",
                     description="You do not have permissions for this command!",
-                    color=self.client.error
+                    color=self.client.error,
+                    footer=EmbedFooter(
+                        text="Powered by altera.vip",
+                        icon_url=self.bot.user.avatar.url
+                    )
                 )
                 return await ctx.send(embed=no_perms)
 
@@ -45,7 +49,11 @@ class Limit(Extension):
         confirm_embed = Embed(
             title="Setup",
             description=f"The ticket.json channel category has been changed to `{category.name}`",
-            color=self.client.success
+            color=self.client.success,
+            footer=EmbedFooter(
+                text="Powered by altera.vip",
+                icon_url=self.bot.user.avatar.url
+            )
         )
         return await ctx.send(embed=confirm_embed)
 
